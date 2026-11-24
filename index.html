@@ -3,37 +3,324 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MADAURA - مادورا</title>
+<title>MADAURA - غرف صوتية حقيقية</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
-body{background:#fff5f7;color:#333}
-header{background:#fff;padding:20px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.1);position:sticky;top:0;z-index:10}
-.logo{font-size:32px;font-weight:900;letter-spacing:4px;color:#c2185b}
-.logo span{color:#333;font-size:14px;display:block;letter-spacing:2px}
-.hero{background:linear-gradient(135deg,#fce4ec,#f8bbd0);padding:50px 20px;text-align:center}
-.hero h1{font-size:28px;color:#880e4f;margin-bottom:10px}
-.hero p{color:#666;margin-bottom:20px}
-.btn{background:#c2185b;color:#fff;padding:14px 30px;border:none;border-radius:30px;font-size:16px;font-weight:bold}
-.products{display:grid;grid-template-columns:1fr 1fr;gap:15px;padding:20px}
-.card{background:#fff;border-radius:15px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,.08);text-align:center;padding-bottom:15px}
-.card img{width:100%;height:180px;object-fit:cover}
-.card h3{margin:10px 0 5px;font-size:16px}
-.card p{color:#888;font-size:13px;padding:0 10px}
-.price{color:#c2185b;font-weight:900;font-size:18px;margin:8px 0;display:block}
-.add{background:#111;color:#fff;border:none;padding:10px 20px;border-radius:20px;width:85%}
-footer{background:#111;color:#fff;text-align:center;padding:25px;margin-top:20px}
-footer a{color:#f48fb1;text-decoration:none}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',sans-serif}
+body{background:#000;color:#fff;height:100vh;overflow:hidden}
+.gold{color:#D4AF37}.center{text-align:center}
+h1{font-family:'Amiri',serif;font-size:38px;color:#D4AF37}
+.page{display:none;height:100vh;overflow-y:auto;padding:16px;padding-bottom:120px}
+.page.active{display:block}
+.card{background:#0F0F0F;border:1px solid #2A2A2A;border-radius:20px;padding:16px;margin:12px 0}
+.card.gold-border{border-color:#D4AF37}
+input,select{width:100%;background:#000;border:1px solid #3A3A3A;color:#fff;padding:13px;border-radius:13px;margin:7px 0;outline:none}
+input:focus,select:focus{border-color:#D4AF37}
+.btn{background:linear-gradient(90deg,#F5D67B,#D4AF37,#B8860B);color:#000;border:none;width:100%;padding:14px;border-radius:14px;font-weight:900;font-size:16px;cursor:pointer;margin-top:10px}
+.btn-outline{background:transparent;color:#D4AF37;border:1px solid #D4AF37;width:100%;padding:11px;border-radius:13px;font-weight:700;cursor:pointer;margin-top:8px}
+.btn-red{background:transparent;color:#ff8888;border:1px solid #ff5555;width:100%;padding:11px;border-radius:13px;font-weight:700;cursor:pointer;margin-top:8px}
+.logo{width:120px;height:120px;border:2px solid #D4AF37;border-radius:50%;margin:8px auto;overflow:hidden;background:#1a1a1a;display:flex;align-items:center;justify-content:center}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:4px 2px 10px}
+.topbar button{background:#111;border:1px solid #D4AF37;color:#D4AF37;width:40px;height:40px;border-radius:50%;cursor:pointer}
+.badge{background:#D4AF37;color:#000;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:800}
+.avatar{width:70px;height:70px;border-radius:50%;border:2px solid #D4AF37;object-fit:cover}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#080808;border-top:1px solid #D4AF37;display:flex;justify-content:space-around;align-items:flex-end;padding:8px 4px 12px;z-index:99}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:#D4AF37;background:none;border:none;cursor:pointer}
+.nav-item.active{color:#fff}
+.fab{width:58px;height:58px;background:#D4AF37;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:-28px;border:3px solid #000;font-size:26px;font-weight:900;color:#000;cursor:pointer;box-shadow:0 0 18px #D4AF37}
+.icon{width:24px;height:24px;stroke:#D4AF37;fill:none;stroke-width:1.8}
+.msg{background:#161616;border:1px solid #2A2A2A;padding:10px;border-radius:14px;margin:8px 0}
+.msg.me{background:#2A2200;border-color:#D4AF37}
+.table{width:48px;height:48px;border:1.5px solid #D4AF37;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin:5px;font-size:11px;cursor:pointer}
+.table.taken{border-color:#444;color:#666}.table.mine{background:#D4AF37;color:#000;font-weight:900}
+.room{background:#111;border:1px solid #2A2A2A;padding:12px;border-radius:14px;margin:8px 0;display:flex;justify-content:space-between;align-items:center}
+.hidden{display:none}
+.chip{display:inline-block;background:#111;border:1px solid #D4AF37;color:#D4AF37;padding:5px 10px;border-radius:20px;font-size:12px;margin:3px;cursor:pointer}
+.chip.sel{background:#D4AF37;color:#000;font-weight:900}
+.quiz-timer{font-size:30px;color:#D4AF37;font-weight:900;text-align:center}
+.lang{position:absolute;top:14px;left:14px;background:#111;border:1px solid #D4AF37;color:#D4AF37;padding:6px 10px;border-radius:20px;font-size:12px;cursor:pointer;z-index:100}
+.alert-ok{background:#1a2a1a;border:1px solid #2ecc71;padding:10px;border-radius:12px;color:#7CFC9A;font-size:13px;margin:8px 0}
+.alert-no{background:#2a1a1a;border:1px solid #ff5555;padding:10px;border-radius:12px;color:#ff9999;font-size:13px;margin:8px 0}
+.speaker{width:68px;height:68px;border-radius:50%;border:3px solid #444;background:#222;display:flex;align-items:center;justify-content:center;font-size:28px;transition:.3s}
+.speaker.talking{border-color:#D4AF37;box-shadow:0 0 20px #D4AF37;transform:scale(1.05)}
+.codeBox{background:#000;border:1px dashed #D4AF37;padding:10px;border-radius:12px;text-align:center;font-size:22px;font-weight:900;letter-spacing:4px;color:#D4AF37;margin:8px 0}
 </style>
 </head>
 <body>
-<header><div class="logo">MADAURA<span>مادورا | BEAUTY & FASHION</span></div></header>
-<div class="hero"><h1>جمالك يبدأ من هنا ✨</h1><p>أفضل منتجات التجميل و العناية - توصيل سريع لكل الولايات</p><button class="btn" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">تسوقي الآن 🛍️</button></div>
-<div class="products" id="shop">
-<div class="card"><img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=500"><h3>باليت مكياج فاخرة</h3><p>ألوان ثابته و لمعة تدوم</p><span class="price">2,500 دج</span><button class="add" onclick="alert('تمت الإضافة للسلة ✅')">أضيفي للسلة</button></div>
-<div class="card"><img src="https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=500"><h3>سيروم فيتامين C</h3><p>لبشرة مشرقة و نضرة</p><span class="price">3,200 دج</span><button class="add" onclick="alert('تمت الإضافة للسلة ✅')">أضيفي للسلة</button></div>
-<div class="card"><img src="https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=500"><h3>روج مات ثابت</h3><p>لون قوي يدوم 24 ساعة</p><span class="price">1,500 دج</span><button class="add" onclick="alert('تمت الإضافة للسلة ✅')">أضيفي للسلة</button></div>
-<div class="card"><img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=500"><h3>مجموعة العناية بالبشرة</h3><p>روتين كامل لبشرتك</p><span class="price">5,500 دج</span><button class="add" onclick="alert('تمت الإضافة للسلة ✅')">أضيفي للسلة</button></div>
+<button class="lang" onclick="alert('AR / FR / EN')">AR | FR | EN</button>
+
+<div id="p1" class="page active">
+<div class="center"><div class="logo"><svg width="110" height="110" viewBox="0 0 120 120"><rect width="120" height="120" fill="#000"/><text x="60" y="38" text-anchor="middle" fill="#D4AF37" font-size="28" font-family="serif" font-weight="bold">M</text><rect x="20" y="55" width="8" height="40" fill="#D4AF37"/><rect x="35" y="50" width="8" height="45" fill="#D4AF37"/><rect x="50" y="45" width="8" height="50" fill="#D4AF37"/><rect x="65" y="50" width="8" height="45" fill="#D4AF37"/><rect x="80" y="55" width="8" height="40" fill="#D4AF37"/><rect x="15" y="48" width="80" height="6" fill="#D4AF37"/><rect x="15" y="95" width="90" height="5" fill="#D4AF37"/><text x="60" y="112" text-anchor="middle" fill="#D4AF37" font-size="9">MADOURA</text></svg></div>
+<h1>MADAURA</h1><p style="color:#aaa;font-size:13px">جامعة مادورا - منصة الطلبة الجامعيين</p></div>
+<div class="card gold-border"><h3 class="gold center">إنشاء حساب</h3>
+<input id="name" placeholder="الاسم الكامل"><input id="email" placeholder="البريد الإلكتروني" type="email"><input id="pass" placeholder="إنشاء كلمة السر" type="password"><input id="age" placeholder="العمر" type="number">
+<label class="gold" style="font-size:13px">الميدان</label><select id="domain1" onchange="fillBranches('domain1','branch1','spec1')"></select>
+<label class="gold" style="font-size:13px">الفرع</label><select id="branch1" onchange="fillSpecs('domain1','branch1','spec1')"></select>
+<label class="gold" style="font-size:13px">التخصص</label><select id="spec1"></select>
+<select id="level"><option>المستوى الدراسي</option><option>ليسانس 1</option><option>ليسانس 2</option><option>ليسانس 3</option><option>ماستر 1</option><option>ماستر 2</option><option>دكتوراه</option><option>طب - سنة 1</option><option>طب - سنة 2</option><option>طب - سنة 3</option><option>طب - سنة 4</option><option>طب - سنة 5</option><option>طب - سنة 6</option></select>
+<button class="btn" onclick="go('p2')">إنشاء الحساب و المتابعة ←</button></div>
 </div>
-<footer><h3>MADAURA</h3><p>للطلب راسلينا على واتساب</p><br><a href="https://wa.me/213000000000">اطلبي عبر واتساب 📱</a><br><br><p>© 2026 MADAURA - كل الحقوق محفوظة</p></footer>
+
+<div id="p2" class="page">
+<div class="center"><h1 style="font-size:28px">اختيار تخصصك</h1><p style="color:#aaa;font-size:13px">أكد أنك طالب في هذا التخصص</p></div>
+<div class="card"><label class="gold">الميدان</label><select id="domain2" onchange="fillBranches('domain2','branch2','spec2')"></select>
+<label class="gold">الفرع</label><select id="branch2" onchange="fillSpecs('domain2','branch2','spec2')"></select>
+<label class="gold">التخصص الدقيق</label><select id="spec2"></select><div id="chips"></div>
+<label class="gold">بطاقة الطالب - إجبارية</label><p style="font-size:12px;color:#aaa">إذا التخصص في البطاقة مختلف، يتم رفض دخولك.</p>
+<input type="file" accept="image/*" onchange="uploadCard(this)"><img id="cardPreview" class="hidden" style="width:100%;border-radius:12px;margin-top:8px;border:1px solid #D4AF37">
+<label class="gold">التخصص المكتوب في بطاقة الطالب</label><select id="cardSpec" onchange="checkCard()"></select>
+<input id="cardNumber" placeholder="رقم بطاقة الطالب"><div id="cardMsg"></div>
+<button class="btn" onclick="startQuiz()">تأكيد البطاقة و بدء الاختبار (7 أسئلة / 35 ثانية)</button></div>
+<div id="quizBox" class="card hidden"><div class="quiz-timer">⏱ <span id="timer">35</span> ثانية</div><p id="qText" style="font-weight:700;margin:10px 0"></p><div id="answers"></div><p id="quizResult" class="gold center"></p><button id="nextBtn" class="btn hidden" onclick="go('p3')">دخول التطبيق ←</button></div>
+<div class="card"><b class="gold">كل التخصصات</b><div id="allMajors"></div></div>
+</div>
+
+<div id="p3" class="page">
+<div class="topbar"><h1 style="font-size:28px">MADAURA</h1><div style="display:flex;gap:8px"><button onclick="showNotif()">🔔</button><button onclick="go('settings')">⚙</button></div></div>
+<div class="card"><b class="gold">أهلا بك، <span id="userName">طالبة ماستر</span></b><p style="font-size:13px;color:#aaa"><span id="userSpec">إنتاج نباتي</span> | <span id="userLevel">ماستر 1</span> | جامعة مادورا</p></div>
+<div class="card"><b class="gold">منشورات تخصصك</b><p style="margin:8px 0">سارة - حماية النبات: شكون عندو ملخص الميلديو؟</p><p>أمين - إنتاج نباتي: محاضرة الغد 10:00 القاعة 3</p></div>
+<div class="card"><b class="gold">غرفة صوتية نشطة الآن</b><p>غرفة مراجعة - إنتاج نباتي | 3 متحدثين</p><button class="btn" onclick="go('chat');setTimeout(()=>document.getElementById('voiceSection').scrollIntoView(),300)">ادخل الغرفة الصوتية ←</button></div>
+</div>
+
+<div id="profile" class="page">
+<div class="topbar"><h1 style="font-size:26px">الملف الشخصي</h1><button onclick="go('p3')">←</button></div>
+<div class="card center"><img id="profImg" src="https://i.pravatar.cc/150?img=32" class="avatar"><br><input type="file" accept="image/*" onchange="document.getElementById('profImg').src=URL.createObjectURL(this.files[0])"><h3 id="profName">طالبة ماستر 1</h3><p style="color:#aaa" id="profSpec">إنتاج نباتي - جامعة مادورا</p><p style="font-size:12px;color:#D4AF37" id="profCard">بطاقة الطالب: موثقة ✅</p><input id="statusInput" placeholder="اكتب حالتك أو قصتك..."><button class="btn" onclick="alert('تم نشر حالتك ✅')">نشر الحالة / قصة</button></div>
+<div class="card"><b class="gold">معلوماتي</b><p>الاسم: <span id="infoName">---</span></p><p>البريد: <span id="infoEmail">---</span></p><p>العمر: <span id="infoAge">---</span></p><p>التخصص: <span id="infoSpec">---</span></p><p>المستوى: <span id="infoLevel">---</span></p><p>بطاقة الطالب: <span id="infoCard">---</span></p></div>
+</div>
+
+<div id="chat" class="page">
+<div class="topbar"><h1 style="font-size:26px">المحادثة</h1><button onclick="go('p3')">←</button></div>
+<div style="display:flex;gap:8px"><button class="btn" onclick="switchChat('group')">جماعية - أصحاب التخصص</button><button class="btn-outline" onclick="switchChat('private')">أصدقائي فقط</button></div>
+<div id="groupChat"><div class="msg"><b class="gold">أمين:</b> شكون فهم درس اليوم؟</div><div class="msg me"><b>أنت:</b> أنا، نبعثلك الملخص</div></div>
+<div id="privateChat" class="hidden"><div class="msg"><b class="gold">سارة:</b> واش راكي؟ نراجعو مع بعض؟</div></div>
+<div class="card"><input id="chatInput" placeholder="اكتب رسالتك..."><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn-outline" style="width:auto" onclick="sendMsg()">إرسال</button><button class="btn-outline" style="width:auto" id="voiceBtn" onclick="toggleVoiceMsg()">🎤 تسجيل صوتي</button><button class="btn-outline" style="width:auto" onclick="alert('تمت الترجمة')">ترجمة</button><button class="btn-outline" style="width:auto" onclick="alert('اختر صورة أو ملف')">ملف / صورة</button></div><p id="voiceStatus" style="font-size:12px;color:#D4AF37;margin-top:6px"></p></div>
+
+<div id="voiceSection" class="card gold-border">
+<h3 class="gold center">🎧 غرف صوتية حقيقية - HelloTalk Style</h3>
+<p style="font-size:12px;color:#aaa;text-align:center">أنشئي غرفة و ابعثي الكود لصاحبتك، و ادخلو بنفس الكود باش تسمعو بعضكم</p>
+<input id="roomCodeInput" placeholder="اكتبي كود الغرفة - مثلا MADAURA123">
+<div style="display:flex;gap:8px"><button class="btn" onclick="createRoom()">＋ إنشاء غرفة جديدة</button><button class="btn-outline" onclick="joinRoomByCode()">دخول بكود</button></div>
+<div id="roomCodeBox" class="hidden"><p style="font-size:13px">كود غرفتك - ابعثيه لصحاباتك:</p><div class="codeBox" id="roomCodeDisplay">------</div><button class="btn-outline" onclick="copyCode()">نسخ الكود</button><p style="font-size:12px;color:#aaa">صاحبتك تدخل نفس الكود في تيليفونها و تدير دخول</p></div>
+<div id="voiceRoom" class="hidden" style="background:#000;border:1px solid #D4AF37;border-radius:16px;padding:14px;margin-top:12px;text-align:center">
+<p class="gold" style="font-weight:900" id="roomName">غرفة صوتية</p><p id="roomTimer" style="font-size:12px;color:#aaa">00:00</p><p id="onlineCount" style="font-size:12px;color:#7CFC9A">● 1 متصل الآن</p>
+<div id="speakers" style="display:flex;justify-content:center;gap:14px;margin:14px 0;flex-wrap:wrap"></div>
+<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+<button id="micBtn" class="btn" style="width:auto" onclick="toggleMic()">🎤 الميكروفون: مشغل</button>
+<button class="btn-outline" style="width:auto" onclick="toggleHand()">✋ رفع اليد</button>
+<button class="btn-outline" style="width:auto" onclick="leaveRoom()">🚪 خروج</button>
+</div>
+<p id="roomStatus" style="font-size:12px;color:#7CFC9A;margin-top:8px"></p>
+<div id="remoteAudios"></div>
+</div>
+<div class="room"><span>غرفة مراجعة - تخصصك</span><button class="btn-outline" style="width:auto" onclick="quickJoin('MADAURA-REVISION')">دخول</button></div>
+<div class="room"><span>غرفة نقاش عام - مادورا</span><button class="btn-outline" style="width:auto" onclick="quickJoin('MADAURA-GENERAL')">دخول</button></div>
+</div>
+</div>
+
+<div id="library" class="page">
+<div class="topbar"><h1 style="font-size:26px">المكتبة</h1><button onclick="go('p3')">←</button></div>
+<p class="gold center">قاعة محاكاة المكتبة الجامعية - جامعة مادورا</p>
+<div class="card center"><p>اختر طاولة</p><div><span class="table" onclick="joinTable(this)">طاولة 1</span><span class="table taken">طاولة 2<br>محجوزة</span><span class="table" onclick="joinTable(this)">طاولة 3</span></div><div><span class="table" onclick="joinTable(this)">طاولة 4</span><span class="table taken">طاولة 5</span><span class="table" onclick="joinTable(this)">طاولة 6</span></div><button class="btn" onclick="alert('تم حجز طاولتك - دراسة وحدك')">ادرس وحدي</button><button class="btn-outline" onclick="alert('تم إرسال طلب الانضمام، انتظر موافقة صاحب الطاولة')">اطلب الانضمام لطاولة محجوزة</button><p id="tableMsg" style="font-size:13px;color:#D4AF37;margin-top:8px"></p></div>
+</div>
+
+<div id="news" class="page">
+<div class="topbar"><h1 style="font-size:26px">آخر الأخبار</h1><button onclick="go('p3')">←</button></div>
+<p style="color:#aaa;font-size:13px">أخبار تخصصك: <span id="newsSpec">إنتاج نباتي</span></p>
+<div class="card"><span class="badge">جديد</span><h3>ورشة في تخصصك - جامعة مادورا</h3><p>يوم الخميس 10:00 - المدرج B</p></div>
+<div class="card"><h3>نتائج الامتحانات</h3><p>تم نشر النتائج</p></div>
+</div>
+
+<div id="settings" class="page">
+<div class="topbar"><h1 style="font-size:26px">الإعدادات</h1><button onclick="go('p3')">←</button></div>
+<div class="card"><b class="gold">تغيير اللغة</b><button class="btn-outline" onclick="alert('العربية')">العربية</button><button class="btn-outline" onclick="alert('Français')">Français</button><button class="btn-outline" onclick="alert('English')">English</button></div>
+<div class="card"><b class="gold">إدارة الحساب</b><button class="btn-outline" onclick="alert('تعديل الحساب')">إدارة الحساب</button><button class="btn-outline" onclick="alert('تغيير كلمة السر')">تغيير كلمة السر</button><button class="btn-red" onclick="if(confirm('متأكدة تحذفي حسابك؟')){go('p1');alert('تم حذف الحساب')}">حذف الحساب</button></div>
+</div>
+
+<div class="bottom-nav" id="mainNav">
+<button class="nav-item" data-nav="p3" onclick="showTab('p3',this)"><svg class="icon" viewBox="0 0 24 24"><path d="M3 10l9-7 9 7v10a1 1 0 01-1 1h-5v-6h-6v6H4a1 1 0 01-1-1z"/></svg>الرئيسية</button>
+<button class="nav-item" data-nav="profile" onclick="showTab('profile',this)"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>الملف</button>
+<button class="fab" onclick="createPost()">+</button>
+<button class="nav-item" data-nav="chat" onclick="showTab('chat',this)"><svg class="icon" viewBox="0 0 24 24"><path d="M21 12a8 8 0 01-11 7L3 21l2-5A8 8 0 1121 12z"/></svg>المحادثة</button>
+<button class="nav-item" data-nav="library" onclick="showTab('library',this)"><svg class="icon" viewBox="0 0 24 24"><path d="M4 4h16v16H4zM8 4v16M12 8h4"/></svg>المكتبة</button>
+<button class="nav-item" data-nav="news" onclick="showTab('news',this)"><svg class="icon" viewBox="0 0 24 24"><path d="M4 4h16v6H4zM4 14h16v6H4z"/></svg>الأخبار</button>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "PASTE_TA_APIKEY_HNA",
+  authDomain: "PASTE_TA_AUTHDOMAIN",
+  databaseURL: "PASTE_TA_DATABASEURL",
+  projectId: "PASTE_TA_PROJECTID",
+  storageBucket: "PASTE_TA_STORAGE",
+  messagingSenderId: "PASTE_TA_SENDER",
+  appId: "PASTE_TA_APPID"
+};
+let db=null;
+try{ firebase.initializeApp(firebaseConfig); db=firebase.database(); }catch(e){ console.log("Firebase not configured yet"); }
+
+const DATA={
+ "علوم وتكنولوجيا ST":{"هندسة كهربائية":["إلكترونيك","كهروتقني","اتصالات","تحكم آلي","طاقات متجددة"],"هندسة ميكانيكية":["إنشاء ميكانيكي","طاقات","هندسة المواد"],"هندسة مدنية":["بناء","جيوتقني","هيدروليك"],"هندسة العمليات":["هندسة كيميائية","صناعات غذائية"],"هندسة الحاسوب":["أنظمة المعلومات","ذكاء اصطناعي","شبكات","أمن سيبراني"],"هندسة معمارية":["هندسة معمارية","عمران"]},
+ "علوم المادة SM":{"فيزياء":["فيزياء المواد","فيزياء نظرية","فيزياء طبية"],"كيمياء":["كيمياء عضوية","كيمياء تحليلية","كيمياء المواد"]},
+ "رياضيات وإعلام آلي MI":{"رياضيات":["جبر","تحليل","احتمالات وإحصاء"],"إعلام آلي":["أنظمة وشبكات","ذكاء اصطناعي","علوم البيانات","هندسة البرمجيات"]},
+ "علوم الطبيعة والحياة SNV":{"علوم فلاحية":["إنتاج نباتي","حماية النبات","إنتاج حيواني","علوم التربة","علوم الغذاء"],"علوم بيولوجية":["بيولوجيا","بيوكيمياء","ميكروبيولوجيا","بيوتكنولوجيا","علم البيئة"],"بيطرة":["طب بيطري"]},
+ "علوم إنسانية واجتماعية SHS":{"علوم إنسانية":["تاريخ","فلسفة","آثار","علوم الإعلام والاتصال"],"علوم اجتماعية":["علم الاجتماع","علم النفس","علوم التربية"],"علوم إسلامية":["شريعة","أصول الدين"]},
+ "علوم اقتصادية وتجارية":{"علوم اقتصادية":["اقتصاد","اقتصاد دولي","اقتصاد نقدي"],"علوم تجارية":["تجارة دولية","تسويق","مالية ومحاسبة"],"علوم التسيير":["تسيير","موارد بشرية","إدارة المشاريع"]},
+ "حقوق وعلوم سياسية":{"حقوق":["قانون عام","قانون خاص","قانون جنائي","قانون أعمال"],"علوم سياسية":["علاقات دولية","علوم سياسية"]},
+ "آداب ولغات":{"لغة عربية":["أدب عربي","لسانيات عربية"],"لغة فرنسية":["أدب فرنسي","ترجمة فرنسية"],"لغة إنجليزية":["أدب إنجليزي","ترجمة إنجليزية"],"لغات أخرى":["ألمانية","إسبانية","أمازيغية"]},
+ "علوم طبية":{"طب":["طب عام","جراحة","طب أطفال"],"صيدلة":["صيدلة"],"طب أسنان":["طب أسنان"]},
+ "مدارس عليا":{"مدارس عليا للأساتذة ENS":["أستاذ - رياضيات","أستاذ - فيزياء","أستاذ - علوم طبيعية","أستاذ - لغة عربية","أستاذ - لغة إنجليزية"],"مدارس عليا":["ESI - إعلام آلي","ESC - تجارة","ENA - إدارة","ESA - فلاحة","ENP - متعددة التقنيات"]}
+};
+const QUIZ={
+ "إنتاج نباتي":[
+  {q:"ما هو N في NPK؟",a:["أزوت","بوتاس","فوسفور","كالسيوم"],correct:0,exp:"N = أزوت، للنمو الخضري."},
+  {q:"البطاطا تحتاج بوتاس بزاف في؟",a:["تكوين الدرنات","البداية فقط","بعد الحصاد","الشتاء"],correct:0,exp:"البوتاس مهم لتكوين الدرنات."},
+  {q:"أحسن وقت للسقي؟",a:["الصباح الباكر","الظهيرة","وقت الريح","وقت المطر"],correct:0,exp:"الصباح الباكر، بلا تبخر."},
+  {q:"ما هو دور الفوسفور؟",a:["الجذور والزهور","اللون فقط","الطعم","الحجم فقط"],correct:0,exp:"الفوسفور للجذور والزهور."},
+  {q:"نقص الأزوت يسبب؟",a:["اصفرار الأوراق السفلى","احمرار","ذبول","لا شيء"],correct:0,exp:"اصفرار الأوراق القديمة = نقص أزوت."},
+  {q:"التربة المثالية للبطاطا؟",a:["خفيفة، جيدة الصرف","طينية ثقيلة","مالحة","حجرية"],correct:0,exp:"تربة خفيفة جيدة الصرف."},
+  {q:"عند رش المبيد لازم؟",a:["قناع وقفاز","بلا حماية","وقت الشمس","نشرب الماء"],correct:0,exp:"لازم قناع وقفاز، المبيد سام."}
+ ],
+ "حماية النبات":[
+  {q:"ما هو الميلديو؟",a:["مرض فطري","حشرة","نقص ماء","سماد"],correct:0,exp:"الميلديو مرض فطري مع الرطوبة."},
+  {q:"الميلديو يحب؟",a:["رطوبة +85%","جفاف","برد قارس","تربة جافة"],correct:0,exp:"رطوبة عالية فوق 85%."},
+  {q:"أعراض الميلديو على البطاطا؟",a:["بقع بنية + زغب أبيض","أوراق خضراء","ثمار كبيرة","لا شيء"],correct:0,exp:"بقع بنية و زغب أبيض تحت الورقة."},
+  {q:"كيف نكافح الميلديو؟",a:["مبيد فطري وقائي + تهوية","سقي كثير","سماد فقط","لا شيء"],correct:0,exp:"مبيد وقائي + تهوية."},
+  {q:"المنّ يمتص؟",a:["عصارة النبات","الماء فقط","التربة","الهواء"],correct:0,exp:"المنّ يمتص عصارة النبات."},
+  {q:"المكافحة البيولوجية هي؟",a:["استعمال أعداء طبيعيين","رش كثير","حرق الحقل","لا شيء"],correct:0,exp:"أعداء طبيعيين مثل الدعسوقة."},
+  {q:"قبل الرش لازم؟",a:["قراءة الملصق + قناع","رش بلا قراءة","رش وقت الريح","رش وقت المطر"],correct:0,exp:"قراءة الملصق و لبس الحماية."}
+ ],
+ "إعلام آلي":[
+  {q:"ما هي HTML؟",a:["لغة بناء الصفحات","لغة روبوت","قاعدة بيانات","نظام تشغيل"],correct:0,exp:"HTML لبناء هيكل الصفحة."},
+  {q:"ما هو المتغير؟",a:["مكان لتخزين قيمة","دالة","صورة","زر"],correct:0,exp:"المتغير يخزن قيمة."},
+  {q:"ما هي قاعدة البيانات؟",a:["مكان تخزين البيانات","متصفح","تطبيق","لعبة"],correct:0,exp:"لتخزين وتنظيم البيانات."},
+  {q:"ما هو الذكاء الاصطناعي؟",a:["آلة تتعلم","آلة حاسبة","تلفاز","هاتف"],correct:0,exp:"آلة تتعلم من البيانات."},
+  {q:"ما هو Python؟",a:["لغة برمجة","حيوان","نظام","متصفح"],correct:0,exp:"Python لغة برمجة سهلة."},
+  {q:"ما هو الـ Bug؟",a:["خطأ في الكود","حشرة حقيقية","فيروس","تطبيق"],correct:0,exp:"Bug = خطأ في الكود."},
+  {q:"ما هو الـ Frontend؟",a:["واجهة المستخدم","الخادم","قاعدة البيانات","الشبكة"],correct:0,exp:"Frontend = ما يراه المستخدم."}
+ ],
+ "default":[
+  {q:"ما هو أهم عنصر في تخصصك؟",a:["الفهم والتطبيق","الحفظ فقط","الغياب","النسخ"],correct:0,exp:"الفهم والتطبيق هو الأساس."},
+  {q:"أحسن طريقة للمراجعة؟",a:["مراجعة منتظمة + ملخصات","ليلة الامتحان فقط","بدون مراجعة","حفظ بلا فهم"],correct:0,exp:"المراجعة المنتظمة هي الأحسن."},
+  {q:"عند صعوبة في درس؟",a:["تسأل أستاذ أو زميل","تتوقف","تتجاهل الدرس","تنسخ"],correct:0,exp:"اسأل أستاذك أو زملاء تخصصك."},
+  {q:"ما هو دور المكتبة؟",a:["مراجعة وبحث","النوم","اللعب","لا شيء"],correct:0,exp:"المكتبة للمراجعة والبحث."},
+  {q:"كيف تحمي نفسك في المخبر؟",a:["احترام السلامة","بدون حماية","الأكل في المخبر","اللعب"],correct:0,exp:"احترام قواعد السلامة."},
+  {q:"ما هو هدف MADAURA؟",a:["ربط طلبة نفس التخصص","عزل الطلبة","منع المراجعة","لا شيء"],correct:0,exp:"ربط طلبة نفس التخصص."},
+  {q:"أحسن وقت للمراجعة؟",a:["الصباح الباكر + تركيز","وقت النعاس","وقت اللعب","بدون وقت"],correct:0,exp:"الصباح مع التركيز."}
+ ]
+};
+let cardUploaded=false, cardVerified=false;
+function fillBranches(dId,bId,sId){ let d=document.getElementById(dId).value; let bSel=document.getElementById(bId); bSel.innerHTML=''; Object.keys(DATA[d]||{}).forEach(b=>{ let o=document.createElement('option'); o.text=b; bSel.add(o); }); fillSpecs(dId,bId,sId); renderAll(); }
+function fillSpecs(dId,bId,sId){ let d=document.getElementById(dId).value, b=document.getElementById(bId).value; let sSel=document.getElementById(sId); sSel.innerHTML=''; (DATA[d]?.[b]||[]).forEach(s=>{ let o=document.createElement('option'); o.text=s; sSel.add(o); }); if(sId==='spec2') fillCardSpecs(); }
+function fillCardSpecs(){ let all=[]; Object.values(DATA).forEach(br=>{ Object.values(br).forEach(l=>{ l.forEach(s=>all.push(s)); }); }); let cs=document.getElementById('cardSpec'); cs.innerHTML='<option>اختر التخصص المكتوب في بطاقتك</option>'; [...new Set(all)].forEach(s=>{ let o=document.createElement('option'); o.text=s; cs.add(o); }); }
+function renderAll(){ let html=''; Object.keys(DATA).forEach(d=>{ html+=`<div style="font-weight:900;color:#D4AF37;margin:10px 0 4px">${d}</div>`; Object.keys(DATA[d]).forEach(b=>{ html+=`<p style="font-size:13px;margin:4px 0">• ${b}</p>`; DATA[d][b].forEach(s=>{ html+=`<span class="chip" onclick="selectSpec('${s}')">${s}</span>` }); }); }); document.getElementById('allMajors').innerHTML=html; }
+function selectSpec(s){ document.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel')); event.target.classList.add('sel'); document.getElementById('spec2').value=s; checkCard(); }
+function initSelects(){ ['domain1','domain2'].forEach(id=>{ let sel=document.getElementById(id); sel.innerHTML=''; Object.keys(DATA).forEach(d=>{ let o=document.createElement('option'); o.text=d; sel.add(o); }); }); fillBranches('domain1','branch1','spec1'); fillBranches('domain2','branch2','spec2'); renderAll(); }
+initSelects();
+function uploadCard(input){ if(input.files[0]){ document.getElementById('cardPreview').src=URL.createObjectURL(input.files[0]); document.getElementById('cardPreview').classList.remove('hidden'); cardUploaded=true; checkCard(); } }
+function checkCard(){ let chosen=document.getElementById('spec2').value; let cardS=document.getElementById('cardSpec').value; let msg=document.getElementById('cardMsg'); if(!cardUploaded){ msg.innerHTML='<div class="alert-no">⚠️ لازم تحطي صورة بطاقة الطالب أولا</div>'; cardVerified=false; return; } if(!cardS || cardS.includes('اختر')){ msg.innerHTML='<div class="alert-no">⚠️ اختاري التخصص المكتوب في بطاقتك</div>'; cardVerified=false; return; } if(cardS!==chosen){ msg.innerHTML=`<div class="alert-no">❌ تم رفض دخولك: البطاقة ${cardS} ≠ ${chosen}</div>`; cardVerified=false; } else { msg.innerHTML=`<div class="alert-ok">✅ بطاقة موثقة: ${chosen} مطابق للبطاقة.</div>`; cardVerified=true; } }
+let currentQ=0,timeLeft=35,timerInt,quizList=[];
+function go(id){ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(id).classList.add('active'); document.getElementById('mainNav').style.display=(id==='p1'||id==='p2')?'none':'flex'; document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active', b.dataset.nav===id)); if(id==='profile'||id==='p3'){ let spec=document.getElementById('spec2')?.value||document.getElementById('spec1')?.value||'إنتاج نباتي'; let lvl=document.getElementById('level')?.value||'ماستر 1'; document.getElementById('userSpec').innerText=spec; document.getElementById('newsSpec').innerText=spec; document.getElementById('profSpec').innerText=spec+' - جامعة مادورا'; document.getElementById('userLevel').innerText=lvl; document.getElementById('infoLevel').innerText=lvl; document.getElementById('infoSpec').innerText=spec; document.getElementById('infoName').innerText=document.getElementById('name').value||'طالبة ماستر 1'; document.getElementById('infoEmail').innerText=document.getElementById('email').value||'---'; document.getElementById('infoAge').innerText=document.getElementById('age').value||'---'; document.getElementById('infoCard').innerText=document.getElementById('cardNumber').value||'موثقة ✅'; document.getElementById('profName').innerText=document.getElementById('name').value||'طالبة ماستر 1'; document.getElementById('userName').innerText=document.getElementById('name').value||'طالبة ماستر'; } window.scrollTo(0,0); }
+function showTab(id,btn){ go(id); }
+function startQuiz(){ if(!cardUploaded){ alert('لازم تحطي بطاقة الطالب أولا'); return; } if(!cardVerified){ alert('التخصص في البطاقة غير مطابق. تم رفض دخولك.'); return; } let spec=document.getElementById('spec2').value; quizList=QUIZ[spec]||QUIZ['default']; document.getElementById('quizBox').classList.remove('hidden'); currentQ=0; timeLeft=35; clearInterval(timerInt); timerInt=setInterval(()=>{ timeLeft--; document.getElementById('timer').innerText=timeLeft; if(timeLeft<=0) finishQuiz(); },1000); showQ(); }
+function showQ(){ if(currentQ>=quizList.length){ finishQuiz(); return; } let q=quizList[currentQ]; document.getElementById('qText').innerText=`السؤال ${currentQ+1}/7 - ${document.getElementById('spec2').value} : ${q.q}`; let html=''; q.a.forEach((ans,i)=>{ html+=`<button class="btn-outline" onclick="answerQ(${i})">${ans}</button>` }); document.getElementById('answers').innerHTML=html; }
+function answerQ(i){ let q=quizList[currentQ]; let msg=i===q.correct?`✅ صحيح! ${q.exp}`:`❌ خطأ. الصحيح: ${q.a[q.correct]}. ${q.exp}`; document.getElementById('quizResult').innerText=msg; setTimeout(()=>{ currentQ++; document.getElementById('quizResult').innerText=''; showQ(); },1300); }
+function finishQuiz(){ clearInterval(timerInt); document.getElementById('answers').innerHTML=`<p class="center gold">تم قبولك حتى لو كانت بعض الإجابات خاطئة ✅</p>`; document.getElementById('qText').innerText='انتهى الاختبار - تم قبولك'; document.getElementById('nextBtn').classList.remove('hidden'); }
+function createPost(){ let t=prompt('اكتب منشورك:'); if(t) alert('تم نشر منشورك: '+t); }
+function showNotif(){ alert('إشعارات: سارة علقت، أمين دعاك لطاولة 3، خبر جديد في تخصصك'); }
+function switchChat(t){ document.getElementById('groupChat').classList.toggle('hidden',t!=='group'); document.getElementById('privateChat').classList.toggle('hidden',t!=='private'); }
+function sendMsg(){ let v=document.getElementById('chatInput').value; if(!v) return; let d=document.createElement('div'); d.className='msg me'; d.innerHTML=`<b>أنت:</b> ${v}`; document.getElementById('groupChat').appendChild(d); document.getElementById('chatInput').value=''; if(db && currentRoomId){ db.ref('rooms/'+currentRoomId+'/chat').push({name:document.getElementById('name').value||'طالب', text:v, time:Date.now()}); } }
+function joinTable(el){ if(el.classList.contains('taken')){ alert('هذه الطاولة محجوزة، اطلب إذن صاحبها'); return; } document.querySelectorAll('.table').forEach(t=>t.classList.remove('mine')); el.classList.add('mine'); document.getElementById('tableMsg').innerText='تم حجز الطاولة لك.'; }
+let mediaRecorder=null, audioChunks=[], isRecording=false;
+async function toggleVoiceMsg(){
+  let btn=document.getElementById('voiceBtn');
+  if(!isRecording){
+    try{
+      let stream=await navigator.mediaDevices.getUserMedia({audio:true});
+      mediaRecorder=new MediaRecorder(stream); audioChunks=[];
+      mediaRecorder.ondataavailable=e=>audioChunks.push(e.data);
+      mediaRecorder.onstop=()=>{ let blob=new Blob(audioChunks,{type:'audio/webm'}); let url=URL.createObjectURL(blob); let div=document.createElement('div'); div.className='msg me'; div.innerHTML=`<b>أنت - رسالة صوتية 🎤</b><br><audio controls src="${url}" style="width:100%;margin-top:6px"></audio>`; document.getElementById('groupChat').appendChild(div); document.getElementById('voiceStatus').innerText='تم إرسال الرسالة الصوتية ✅'; };
+      mediaRecorder.start(); isRecording=true; btn.innerText='⏹️ توقيف و إرسال'; btn.style.background='#D4AF37'; btn.style.color='#000'; document.getElementById('voiceStatus').innerText='🔴 قاعدة تسجلي... اهدري دروك';
+    }catch(e){ alert('لازم تسمحي للميكروفون: ديري Allow'); }
+  } else { mediaRecorder.stop(); mediaRecorder.stream.getTracks().forEach(t=>t.stop()); isRecording=false; btn.innerText='🎤 تسجيل صوتي'; btn.style.background='transparent'; btn.style.color='#D4AF37'; }
+}
+let myId='u'+Math.random().toString(36).slice(2,8);
+let myName='طالب';
+let currentRoomId=null, localStream=null, peers={}, roomTimerInt=null, roomSec=0, micOn=true, handUp=false;
+function createRoom(){
+  let code='MADAURA'+Math.floor(100+Math.random()*900);
+  document.getElementById('roomCodeInput').value=code;
+  document.getElementById('roomCodeBox').classList.remove('hidden');
+  document.getElementById('roomCodeDisplay').innerText=code;
+  joinVoiceRoom(code);
+}
+function joinRoomByCode(){ let code=document.getElementById('roomCodeInput').value.trim().toUpperCase(); if(!code){ alert('اكتبي كود الغرفة أولا'); return; } joinVoiceRoom(code); }
+function quickJoin(code){ document.getElementById('roomCodeInput').value=code; joinVoiceRoom(code); }
+function copyCode(){ let c=document.getElementById('roomCodeDisplay').innerText; navigator.clipboard.writeText(c); alert('تم نسخ الكود: '+c+' - ابعثيه لصاحبتك'); }
+async function joinVoiceRoom(code){
+  if(!db){ alert('لازم تحطي Firebase Config أولا باش تسمعو بعضكم. بلا Config الغرفة تخدم عندك برك.'); document.getElementById('voiceRoom').classList.remove('hidden'); return; }
+  currentRoomId=code; myName=document.getElementById('name').value||'طالب '+myId;
+  document.getElementById('voiceRoom').classList.remove('hidden');
+  document.getElementById('roomName').innerText='غرفة: '+code;
+  document.getElementById('roomCodeBox').classList.remove('hidden');
+  document.getElementById('roomCodeDisplay').innerText=code;
+  try{ localStream=await navigator.mediaDevices.getUserMedia({audio:true}); document.getElementById('roomStatus').innerText='تم الدخول ✅ - صوتك مسموع للآخرين'; }catch(e){ document.getElementById('roomStatus').innerText='دخلتي بلا ميكروفون - سمحي للميكروفون'; return; }
+  renderSpeakers([myName]);
+  let myRef=db.ref('rooms/'+code+'/users/'+myId);
+  myRef.set({name:myName, joined:Date.now()}); myRef.onDisconnect().remove();
+  db.ref('rooms/'+code+'/users').on('value', snap=>{
+    let users=snap.val()||{}; let names=Object.values(users).map(u=>u.name);
+    document.getElementById('onlineCount').innerText='● '+names.length+' متصل الآن';
+    renderSpeakers(names);
+    Object.keys(users).forEach(uid=>{
+      if(uid!==myId && !peers[uid]) createPeer(uid, true);
+    });
+  });
+  db.ref('rooms/'+code+'/signals/'+myId).on('child_added', async snap=>{
+    let data=snap.val(); let from=data.from;
+    if(data.type==='offer'){ let pc=createPeer(from,false); await pc.setRemoteDescription(new RTCSessionDescription(data.offer)); let ans=await pc.createAnswer(); await pc.setLocalDescription(ans); db.ref('rooms/'+code+'/signals/'+from).push({from:myId, type:'answer', answer:ans}); }
+    if(data.type==='answer' && peers[from]){ await peers[from].setRemoteDescription(new RTCSessionDescription(data.answer)); }
+    if(data.type==='ice' && peers[from]){ try{ await peers[from].addIceCandidate(new RTCIceCandidate(data.candidate)); }catch(e){} }
+    snap.ref.remove();
+  });
+  clearInterval(roomTimerInt); roomSec=0;
+  roomTimerInt=setInterval(()=>{ roomSec++; let m=String(Math.floor(roomSec/60)).padStart(2,'0'); let s=String(roomSec%60).padStart(2,'0'); document.getElementById('roomTimer').innerText=m+':'+s+' - في الغرفة'; },1000);
+  document.getElementById('voiceRoom').scrollIntoView({behavior:'smooth'});
+}
+function createPeer(uid, isInitiator){
+  let pc=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'}]});
+  peers[uid]=pc;
+  if(localStream) localStream.getTracks().forEach(t=>pc.addTrack(t, localStream));
+  pc.onicecandidate=e=>{ if(e.candidate && db) db.ref('rooms/'+currentRoomId+'/signals/'+uid).push({from:myId, type:'ice', candidate:e.candidate}); };
+  pc.ontrack=e=>{
+    let aud=document.getElementById('audio-'+uid);
+    if(!aud){ aud=document.createElement('audio'); aud.id='audio-'+uid; aud.autoplay=true; aud.playsInline=true; document.getElementById('remoteAudios').appendChild(aud); }
+    aud.srcObject=e.streams[0];
+    document.getElementById('roomStatus').innerText='صوت صاحبتك مسموع الآن 🔊';
+  };
+  if(isInitiator){ pc.createOffer().then(async offer=>{ await pc.setLocalDescription(offer); db.ref('rooms/'+currentRoomId+'/signals/'+uid).push({from:myId, type:'offer', offer:offer}); }); }
+  return pc;
+}
+function renderSpeakers(names){
+  let html=''; names.forEach((n,i)=>{
+    html+=`<div style="text-align:center"><div class="speaker ${i===0?'talking':''}">${i===0?'👩':'👨'}</div><p style="font-size:12px">${n}</p><p style="font-size:11px;color:#7CFC9A">${i===0?'أنت':'في الغرفة'}</p></div>`;
+  });
+  document.getElementById('speakers').innerHTML=html || '<p>لا أحد في الغرفة</p>';
+}
+function toggleMic(){
+  micOn=!micOn; if(localStream) localStream.getAudioTracks().forEach(t=>t.enabled=micOn);
+  document.getElementById('micBtn').innerText=micOn?'🎤 الميكروفون: مشغل':'🔇 الميكروفون: مغلق';
+  document.getElementById('roomStatus').innerText=micOn?'الميكروفون مشغل - صوتك مسموع':'الميكروفون مغلق - راكي تسمعي برك';
+}
+function toggleHand(){ handUp=!handUp; alert(handUp?'رفعتي يدك ✋':'نزلتي يدك'); }
+function leaveRoom(){
+  if(localStream) localStream.getTracks().forEach(t=>t.stop());
+  Object.values(peers).forEach(pc=>pc.close()); peers={};
+  if(db && currentRoomId){ db.ref('rooms/'+currentRoomId+'/users/'+myId).remove(); db.ref('rooms/'+currentRoomId+'/signals/'+myId).remove(); }
+  clearInterval(roomTimerInt); document.getElementById('voiceRoom').classList.add('hidden'); currentRoomId=null; alert('خرجتي من الغرفة');
+}
+go('p1');
+</script>
 </body>
 </html>
