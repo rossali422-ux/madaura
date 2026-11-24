@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MADAURA - مادورا</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#fff5f7;color:#333}
+header{background:#fff;padding:20px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.1);position:sticky;top:0;z-index:10}
+.logo{font-size:32px;font-weight:900;letter-spacing:4px;color:#c2185b}
+.logo span{color:#333;font-size:14px;display:block;letter-spacing:2px}
+.hero{background:linear-gradient(135deg,#fce4ec,#f8bbd0);padding:50px 20px;text-align:center}
+.hero h1{font-size:28px;color:#880e4f;margin-bottom:10px}
+.hero p{color:#666;margin-bottom:20px}
+.btn{background:#c2185b;color:#fff;padding:14px 30px;border:none;border-radius:30px;font-size:16px;font-weight:bold}
+.products{display:grid;grid-template-columns:1fr 1fr;gap:15px;padding:20px}
+.card{background:#fff;border-radius:15px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,.08);text-align:center;padding-bottom:15px}
+.card img{width:100%;height:180px;object-fit:cover}
+.card h3{margin:10px 0 5px;font-size:16px}
+.card p{color:#888;font-size:13px;padding:0 10px}
+.price{color:#c2185b;font-weight:900;font-size:18px;margin:8px 0;display:block}
+.add{background:#111;color:#fff;border:none;padding:10px 20px;border-radius:20px;width:85%}
+footer{background:#111;color:#fff;text-align:center;padding:25px;margin-top:20px}
+footer a{color:#f48fb1;text-decoration:none}
+</style>
+</head>
+<body>
+<header><div class="logo">MADAURA<span>مادورا | BEAUTY & FASHION</span></div></header>
+<div class="hero"><h1>جمالك يبدأ من هنا ✨</h1><p>أفضل منتجات التجميل و العناية - توصيل سريع لكل الولايات</p><button class="btn" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">تسوقي الآن 🛍️</button></div>
+<div class="products" id="shop">
+<div class="card"><img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=500"><h3>باليت مكياج فاخرة</h3><p>ألوان ثابته و لمعة تدوم</p><span class="price">2,500 دج</span><button class="add" onclick="alert('تمت الإضافة للسلة ✅')">أضيفي للسلة</button></div>
+<div class="card"><img src="https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=500"><h3>سيروم فيتامين C</h3><p>لبشرة مشرقة و نضرة</p><span class="price">3,200 دج</span><button class="add" onclick="alert('تمت الإضافة للسلة ✅')">أضيفي للسلة</button></div>
+<div class="card"><img src="https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=500"><h3>روج مات ثابت</h3><p>لون قوي يدوم 24 ساعة</p><span class="price">1,500 دج</span><button class="add" onclick="alert('تمت الإضافة للسلة ✅')">أضيفي للسلة</button></div>
+<div class="card"><img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=500"><h3>مجموعة العناية بالبشرة</h3><p>روتين كامل لبشرتك</p><span class="price">5,500 دج</span><button class="add" onclick="alert('تمت الإضافة للسلة ✅')">أضيفي للسلة</button></div>
+</div>
+<footer><h3>MADAURA</h3><p>للطلب راسلينا على واتساب</p><br><a href="https://wa.me/213000000000">اطلبي عبر واتساب 📱</a><br><br><p>© 2026 MADAURA - كل الحقوق محفوظة</p></footer>
+</body>
+</html>
